@@ -1,0 +1,22 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t meatball117/react-test -f ./client/dockerfile.dev ./client
+
+script:
+  - docker run meatball117/react-test npm test -- --coverage
+
+after_success:
+  - docker build -t meatball117/multi-client -f ./client/dockerfile ./client
+  - docker build -t meatball117/multi-nginx -f ./nginx/dockerfile ./nginx
+  - docker build -t meatball117/multi-server -f ./server/dockerfile ./server
+  - docker build -t meatball117/multi-worker -f ./worker/dockerfile ./worker
+  #log into docker cli
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  #push images to docker
+  - docker push meatball117/multi-client
+  - docker push meatball117/multi-nginx
+  - docker push meatball117/multi-server
+  - docker push meatball117/multi-worker
