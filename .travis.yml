@@ -6,7 +6,7 @@ before_install:
   - docker build -t meatball117/react-test -f ./client/dockerfile.dev ./client
 
 script:
-  - docker run meatball117/react-test npm test -- --coverage
+  - docker run -e CI=true meatball117/react-test npm test
 
 after_success:
   - docker build -t meatball117/multi-client -f ./client/dockerfile ./client
